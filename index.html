@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NPS Feedback</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Por favor, selecciona tu calificación:</h2>
+    <div class="emoticons">
+      <div class="emoticon very-sad" id="very-sad">&#128542;</div>
+      <div class="emoticon sad" id="sad">&#128532;</div>
+      <div class="emoticon happy" id="happy">&#128512;</div>
+      <div class="emoticon very-happy" id="very-happy">&#128516;</div>
+    </div>
+    <div id="comment-section" style="display: none;">
+      <textarea id="comment" placeholder="Escribe tu comentario aquí..."></textarea>
+      <button onclick="submitFeedback()">Enviar</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
