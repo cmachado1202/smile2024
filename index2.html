@@ -5,45 +5,129 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
   <!-- Carga de la biblioteca de Firebase versión 8.x -->
-
-  
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <title>NPS Feedback</title>
-
 </head>
 <body>
   <div class="container">
     <div>
       <h2>¿Qué estuvo bien?</h2>
       <div id="buttons">
-        <div id="buttons">
-            <button onclick="selectFeedback('Aroma')" data-feedback="Aroma">Aroma</button>
-            <button onclick="selectFeedback('Insumos')" data-feedback="Insumos">Insumos</button>
-            <button onclick="selectFeedback('La limpieza')" data-feedback="La limpieza">La limpieza</button>
-            <button onclick="selectFeedback('Otros')" data-feedback="Otros">Otros</button>
-          </div>
-      
-        
-      </div>
-      
-
-      <div id="comment-section" style="display: none;">
-        <!-- Textarea para el comentario -->
-        <textarea id="comment" placeholder="Escribe tu comentario aquí..."></textarea>
-        <!-- Botón para enviar el feedback -->
-        <button onclick="submitFeedback()">Enviar</button>
+        <button onclick="selectFeedback('Aroma')" data-feedback="Aroma">Aroma</button>
+        <button onclick="selectFeedback('Insumos')" data-feedback="Insumos">Insumos</button>
+        <button onclick="selectFeedback('La limpieza')" data-feedback="La limpieza">La limpieza</button>
+        <button onclick="selectFeedback('Otros')" data-feedback="Otros">Otros</button>
       </div>
     </div>
-  
-    <!-- Script de Firebase y script personalizado -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-   
 
+    <div id="comment-section" style="display: none;">
+      <!-- Textarea para el comentario -->
+      <textarea id="comment" placeholder="Escribe tu comentario aquí..." oninput="resetTimer()" onfocus="startTimer()" onblur="stopTimer()"></textarea>
+      <!-- Botón para enviar el feedback -->
+      <button onclick="submitFeedback()">Enviar</button>
+    </div>
+  </div>
+
+  <!-- Script de Firebase y script personalizado -->
   <script src="script.js"></script>
-  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var urlParams = new URLSearchParams(window.location.search);
+      var selectedEmoticon = urlParams.get('emoticon');
+      console.log('Emoticon seleccionado:', selectedEmoticon);
 
+      // Si hay un emoticón seleccionado, almacenarlo en Firebase y establecer temporizador
+      if (selectedEmoticon) {
+        storeEmoticon(selectedEmoticon);
+        setTimeout(submitFeedback, 5000); // Esperar 5 segundos antes de enviar el feedback si no se selecciona nada en index2.html
+      }
+    });
+
+    var typingTimer;
+    var doneTypingInterval = 15000; // Esperar 15 segundos después de que el usuario termine de escribir
+    var userTyping = false; // Variable para rastrear si el usuario está escribiendo
+    var feedbackSubmitted = false; // Variable para rastrear si se ha enviado el feedback
+
+    function selectFeedback(feedbackType) {
+      var buttons = document.querySelectorAll('#buttons button');
+      buttons.forEach(function(button) {
+        button.classList.remove('selected');
+        if (button.getAttribute('data-feedback') === feedbackType) {
+          button.classList.add('selected');
+        }
+      });
+
+      document.getElementById('comment-section').style.display = 'block'; // Mostrar el cuadro de texto
+      resetTimer();
+    }
+
+    function startTimer() {
+      userTyping = true;
+      clearTimeout(typingTimer);
+      typingTimer = setTimeout(submitFeedback, doneTypingInterval);
+    }
+
+    function resetTimer() {
+      clearTimeout(typingTimer);
+      if (userTyping) {
+        typingTimer = setTimeout(submitFeedback, doneTypingInterval);
+      }
+    }
+
+    function stopTimer() {
+      userTyping = false;
+      clearTimeout(typingTimer);
+    }
+
+    function submitFeedback() {
+      if (!feedbackSubmitted) { // Verificar si el feedback ya se ha enviado para evitar duplicados
+        clearTimeout(typingTimer); // Limpiar el temporizador de escritura
+
+        var selectedFeedbackElement = document.querySelector('#buttons button.selected');
+        var selectedFeedback = selectedFeedbackElement ? selectedFeedbackElement.getAttribute('data-feedback') : null;
+        var comment = document.getElementById('comment').value;
+        var currentDate = new Date();
+        currentDate.setHours(currentDate.getHours() - 3); // Ajustar la hora actual en tres horas
+        var selectedEmoticon = localStorage.getItem('selectedEmoticon');
+        
+        var feedback = {
+          timestamp: currentDate.toISOString(), // Convertir la fecha a una cadena ISO
+          emoticon: selectedEmoticon || "", // Usar el emoticón seleccionado, o una cadena vacía si no hay uno
+          score: selectedFeedback || "", // Usar la categoría seleccionada, o una cadena vacía si no hay una
+          comment: comment || "" // Usar el comentario ingresado, o una cadena vacía si no hay uno
+        };
+
+        // Guardar el feedback en Firebase
+        firebase.database().ref('feedback').push(feedback)
+          .then(function() {
+            // Éxito al enviar el feedback
+            console.log('Feedback enviado a Firebase:', feedback);
+            // Marcar que el feedback se ha enviado
+            feedbackSubmitted = true;
+            // Redirigir a la página de comentarios (index1.html)
+            window.location.href = 'index.html';
+          })
+          .catch(function(error) {
+            // Manejar errores
+            console.error('Error al enviar el feedback:', error);
+          });
+      }
+    }
+
+    // Almacenar el emoticón seleccionado en el almacenamiento local
+    function storeEmoticon(selectedEmoticon) {
+      localStorage.setItem('selectedEmoticon', selectedEmoticon);
+    }
+  </script>
 </body>
-
 </html>
+
+
+
+
+
+
+
 
 
