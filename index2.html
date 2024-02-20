@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+  <!-- Carga de la biblioteca de Firebase versión 8.x -->
+
+  
+  <title>NPS Feedback</title>
+
+</head>
+<body>
+  <div class="container">
+    <div>
+      <h2>¿Qué estuvo bien?</h2>
+      <div id="buttons">
+        <div id="buttons">
+            <button onclick="selectFeedback('Aroma')" data-feedback="Aroma">Aroma</button>
+            <button onclick="selectFeedback('Insumos')" data-feedback="Insumos">Insumos</button>
+            <button onclick="selectFeedback('La limpieza')" data-feedback="La limpieza">La limpieza</button>
+            <button onclick="selectFeedback('Otros')" data-feedback="Otros">Otros</button>
+          </div>
+      
+        
+      </div>
+      
+
+      <div id="comment-section" style="display: none;">
+        <!-- Textarea para el comentario -->
+        <textarea id="comment" placeholder="Escribe tu comentario aquí..."></textarea>
+        <!-- Botón para enviar el feedback -->
+        <button onclick="submitFeedback()">Enviar</button>
+      </div>
+    </div>
+  
+    <!-- Script de Firebase y script personalizado -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+   
+
+  <script src="script.js"></script>
+  
+
+</body>
+
+</html>
+
+
